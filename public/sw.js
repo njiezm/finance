@@ -1,4 +1,4 @@
-const CACHE_NAME = 'finance-perso-v3';
+const CACHE_NAME = 'finance-perso-v4';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',

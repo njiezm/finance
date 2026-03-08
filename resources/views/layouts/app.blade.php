@@ -4,8 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0F172A">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finance">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="vapid-public-key" content="{{ config('services.webpush.public_key') }}">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
     <title>{{ config('app.name', 'Finance Perso Elite Edition') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -210,6 +218,9 @@
         <p class="text-slate-500 dark:text-slate-400 text-sm">{{ $monthLabel ?? now()->translatedFormat('F Y') }}</p>
     </div>
     <div class="flex gap-2">
+        <button id="install-app" class="p-2.5 rounded-full bg-blue-600 text-white transition-colors border-0 mi-btn hidden" title="Installer l'app">
+            <i data-lucide="download" class="w-5 h-5"></i>
+        </button>
         <button id="push-toggle" class="p-2.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors border-0 mi-btn" title="Activer notifications">
             <i data-lucide="bell" class="w-5 h-5"></i>
         </button>
@@ -264,6 +275,8 @@
     const root = document.documentElement;
     const key = 'fp-theme';
     const btn = document.getElementById('theme-toggle');
+    const installBtn = document.getElementById('install-app');
+    let deferredInstallPrompt = null;
 
     function vibrate(pattern = [16]) {
         if ('vibrate' in navigator) navigator.vibrate(pattern);
@@ -476,6 +489,32 @@
             console.error(e);
             toast('Test notification: ' + e.message, 'error', 4200);
         }
+    });
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        installBtn?.classList.remove('hidden');
+    });
+
+    installBtn?.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+
+        if (choice.outcome === 'accepted') {
+            toast('Installation lancee', 'success');
+        }
+
+        deferredInstallPrompt = null;
+        installBtn.classList.add('hidden');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        toast('Application installee', 'success');
+        installBtn?.classList.add('hidden');
+        deferredInstallPrompt = null;
     });
 
     if ('serviceWorker' in navigator) {
