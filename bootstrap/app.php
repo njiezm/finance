@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'app.lock' => \App\Http\Middleware\AppLockMiddleware::class,
+            'guest.app.lock' => \App\Http\Middleware\RedirectIfAppUnlocked::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

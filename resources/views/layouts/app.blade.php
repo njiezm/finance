@@ -230,6 +230,12 @@
         <button id="theme-toggle" class="p-2.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors border-0 mi-btn">
             <i data-lucide="moon" class="w-5 h-5"></i>
         </button>
+        <form method="POST" action="{{ route('auth.logout') }}" class="m-0">
+            @csrf
+            <button class="p-2.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors border-0 mi-btn" title="Se deconnecter" type="submit">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+        </form>
     </div>
 </header>
 
